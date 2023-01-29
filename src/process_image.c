@@ -7,7 +7,17 @@
 float get_pixel(image im, int x, int y, int c)
 {
     // TODO Fill this in
-    return 0;
+    int channels = im.c;
+    int rows = im.h;
+    int cols = im.w;
+
+    // Clamp
+    x = (x > 0) ? ((x<cols) ? x : (cols-1)) : 0;
+    y = (y > 0) ? ((y<rows) ? y : (rows-1)) : 0;
+    c = (c > 0) ? ((c<channels) ? c : (channels-1)) : 0;
+
+    float pixel = *(im.data+(im.h*im.w*c)+(im.w*y+x));
+    return pixel;
 }
 
 void set_pixel(image im, int x, int y, int c, float v)
