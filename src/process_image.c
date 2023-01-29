@@ -16,13 +16,24 @@ float get_pixel(image im, int x, int y, int c)
     y = (y > 0) ? ((y<rows) ? y : (rows-1)) : 0;
     c = (c > 0) ? ((c<channels) ? c : (channels-1)) : 0;
 
-    float pixel = *(im.data+(im.h*im.w*c)+(im.w*y+x));
+    float pixel = *(im.data+(rows*cols*c)+(cols*y+x));
     return pixel;
 }
 
 void set_pixel(image im, int x, int y, int c, float v)
 {
     // TODO Fill this in
+    int rows = im.h;
+    int cols = im.w;
+    int channels = im.c;
+
+    if (x < 0 || y < 0 || c < 0 || x >= cols || y >= rows || c >= channels) {
+        return;
+    }
+    else{
+        *(im.data+(rows*cols*c)+(cols*y+x)) = v;
+        return;
+    }
 }
 
 image copy_image(image im)
