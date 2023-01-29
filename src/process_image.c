@@ -40,6 +40,8 @@ image copy_image(image im)
 {
     image copy = make_image(im.w, im.h, im.c);
     // TODO Fill this in
+    size_t n_bytes = im.w*im.h*im.c*sizeof(float);
+    memcpy(copy.data, im.data, n_bytes);
     return copy;
 }
 
@@ -48,6 +50,10 @@ image rgb_to_grayscale(image im)
     assert(im.c == 3);
     image gray = make_image(im.w, im.h, 1);
     // TODO Fill this in
+    int pixel_per_channel = im.w*im.h;
+    for (size_t i = 0; i!= pixel_per_channel; ++i){
+        gray.data[i] = 0.299*im.data[i] + 0.587*im.data[i+pixel_per_channel] + 0.114*im.data[i+pixel_per_channel*2];
+    }
     return gray;
 }
 
