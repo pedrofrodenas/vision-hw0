@@ -60,6 +60,10 @@ image rgb_to_grayscale(image im)
 void shift_image(image im, int c, float v)
 {
     // TODO Fill this in
+    int pixel_per_channel = im.w*im.h;
+    for (int i = 0; i < pixel_per_channel; ++i){
+        *(im.data + pixel_per_channel*c + i) = (*(im.data + pixel_per_channel*c + i))+v;
+    }
 }
 
 void clamp_image(image im)
