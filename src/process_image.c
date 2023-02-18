@@ -69,6 +69,17 @@ void shift_image(image im, int c, float v)
 void clamp_image(image im)
 {
     // TODO Fill this in
+    int rows = im.h;
+    int cols = im.w;
+    int channels = im.c;
+
+    int i=0;
+    int end = rows*cols*channels;
+
+    while (i != end) {
+        im.data[i] = (im.data[i] > 0) ? ((im.data[i]>1) ? 1 : im.data[i]) : 0;
+        i++;
+    }
 }
 
 
