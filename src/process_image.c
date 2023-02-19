@@ -12,11 +12,11 @@ float get_pixel(image im, int x, int y, int c)
     int cols = im.w;
 
     // Clamp
-    x = (x > 0) ? ((x<cols) ? x : (cols-1)) : 0;
-    y = (y > 0) ? ((y<rows) ? y : (rows-1)) : 0;
-    c = (c > 0) ? ((c<channels) ? c : (channels-1)) : 0;
+    x = (x > 0) ? ((x < cols) ? x : (cols - 1)) : 0;
+    y = (y > 0) ? ((y < rows) ? y : (rows - 1)) : 0;
+    c = (c > 0) ? ((c < channels) ? c : (channels - 1)) : 0;
 
-    float pixel = *(im.data+(rows*cols*c)+(cols*y+x));
+    float pixel = *(im.data + (rows * cols * c) + (cols * y + x));
     return pixel;
 }
 
@@ -27,11 +27,13 @@ void set_pixel(image im, int x, int y, int c, float v)
     int cols = im.w;
     int channels = im.c;
 
-    if (x < 0 || y < 0 || c < 0 || x >= cols || y >= rows || c >= channels) {
+    if (x < 0 || y < 0 || c < 0 || x >= cols || y >= rows || c >= channels)
+    {
         return;
     }
-    else{
-        *(im.data+(rows*cols*c)+(cols*y+x)) = v;
+    else
+    {
+        *(im.data + (rows * cols * c) + (cols * y + x)) = v;
         return;
     }
 }
@@ -40,7 +42,7 @@ image copy_image(image im)
 {
     image copy = make_image(im.w, im.h, im.c);
     // TODO Fill this in
-    size_t n_bytes = im.w*im.h*im.c*sizeof(float);
+    size_t n_bytes = im.w * im.h * im.c * sizeof(float);
     memcpy(copy.data, im.data, n_bytes);
     return copy;
 }
@@ -50,9 +52,10 @@ image rgb_to_grayscale(image im)
     assert(im.c == 3);
     image gray = make_image(im.w, im.h, 1);
     // TODO Fill this in
-    int pixel_per_channel = im.w*im.h;
-    for (size_t i = 0; i!= pixel_per_channel; ++i){
-        gray.data[i] = 0.299*im.data[i] + 0.587*im.data[i+pixel_per_channel] + 0.114*im.data[i+pixel_per_channel*2];
+    int pixel_per_channel = im.w * im.h;
+    for (size_t i = 0; i != pixel_per_channel; ++i)
+    {
+        gray.data[i] = 0.299 * im.data[i] + 0.587 * im.data[i + pixel_per_channel] + 0.114 * im.data[i + pixel_per_channel * 2];
     }
     return gray;
 }
@@ -60,9 +63,10 @@ image rgb_to_grayscale(image im)
 void shift_image(image im, int c, float v)
 {
     // TODO Fill this in
-    int pixel_per_channel = im.w*im.h;
-    for (int i = 0; i < pixel_per_channel; ++i){
-        *(im.data + pixel_per_channel*c + i) = (*(im.data + pixel_per_channel*c + i))+v;
+    int pixel_per_channel = im.w * im.h;
+    for (int i = 0; i < pixel_per_channel; ++i)
+    {
+        *(im.data + pixel_per_channel * c + i) = (*(im.data + pixel_per_channel * c + i)) + v;
     }
 }
 
@@ -73,30 +77,90 @@ void clamp_image(image im)
     int cols = im.w;
     int channels = im.c;
 
-    int i=0;
-    int end = rows*cols*channels;
+    int i = 0;
+    int end = rows * cols * channels;
 
-    while (i != end) {
-        im.data[i] = (im.data[i] > 0) ? ((im.data[i]>1) ? 1 : im.data[i]) : 0;
+    while (i != end)
+    {
+        im.data[i] = (im.data[i] > 0) ? ((im.data[i] > 1) ? 1 : im.data[i]) : 0;
         i++;
     }
 }
 
-
 // These might be handy
 float three_way_max(float a, float b, float c)
 {
-    return (a > b) ? ( (a > c) ? a : c) : ( (b > c) ? b : c) ;
+    return (a > b) ? ((a > c) ? a : c) : ((b > c) ? b : c);
 }
 
 float three_way_min(float a, float b, float c)
 {
-    return (a < b) ? ( (a < c) ? a : c) : ( (b < c) ? b : c) ;
+    return (a < b) ? ((a < c) ? a : c) : ((b < c) ? b : c);
 }
 
 void rgb_to_hsv(image im)
 {
     // TODO Fill this in
+    int rows = im.h;
+    int cols = im.w;
+
+    int channelOffset = rows * cols;
+
+    float R, G, B, V, m, C, S, huep, H = 0;
+    for (int i = 0; i != channelOffset; ++i)
+    {
+        R = im.data[i];
+        G = im.data[i + channelOffset];
+        B = im.data[i + channelOffset * 2];
+
+        V = three_way_max(R, G, B);
+        m = three_way_min(R, G, B);
+
+        if (V == 0)
+        {
+            C = 0;
+            S = 0;
+        }
+        else
+        {
+            C = V - m;
+            S = C / V;
+        }
+
+        if (C == 0)
+        {
+            H = 0;
+            im.data[i] = H;
+            im.data[i + channelOffset] = S;
+            im.data[i + channelOffset * 2] = V;
+        }
+        else
+        {
+            if (V == R)
+            {
+                huep = (G - B) / C;
+            }
+            else if (V == G)
+            {
+                huep = ((B - R) / C) + 2;
+            }
+            else if (V == B)
+            {
+                huep = ((R - G) / C) + 4;
+            }
+            if (huep < 0)
+            {
+                H = (huep / 6) + 1;
+            }
+            else
+            {
+                H = huep / 6;
+            }
+            im.data[i] = H;
+            im.data[i + channelOffset] = S;
+            im.data[i + channelOffset * 2] = V;
+        }
+    }
 }
 
 void hsv_to_rgb(image im)
