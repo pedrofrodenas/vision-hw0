@@ -166,4 +166,78 @@ void rgb_to_hsv(image im)
 void hsv_to_rgb(image im)
 {
     // TODO Fill this in
+    // Assuming linear hue variation.
+    int rows = im.h;
+    int cols = im.w;
+
+    int channelOffset = rows * cols;
+
+    float R, G, B, V, m, C, S, huep, H = 0;
+    for (int i = 0; i != channelOffset; ++i)
+    {
+        H = im.data[i];
+        S = im.data[i + channelOffset];
+        V = im.data[i + channelOffset * 2];
+
+        // Get Chroma, or difference between max and min
+        C = V * S;
+
+        // We know that max is V and we know C so:
+        m = V - C;
+
+        // We want to know huep which vary between 0 and 6
+        // to know to which corner of hexagon we are
+        huep = H*6;
+
+        // Now we want to get the equation of the line for each sector
+        if ((huep >= 0) && (huep < 1)) 
+        {
+            // y = slope*x + n / G = C*mod1(huep) + m
+            G = C*fmod(huep, 1) + m;
+            R = V;
+            B = m;
+        }
+        else if ((huep >= 1) && (huep < 2))
+        {
+            // y = slope*x + n 
+            // -C due to negative slope
+            R = -C*fmod(huep, 1) + V;
+            G = V;
+            B = m;
+        }
+        else if ((huep >= 2) && (huep < 3))
+        {
+            B = C*fmod(huep, 1) + m;
+            G = V;
+            R = m;
+        }
+        else if ((huep >= 3) && (huep < 4))
+        {
+            G = -C*fmod(huep, 1) + V;
+            B = V;
+            R = m;
+        }
+        else if ((huep >= 4) && (huep < 5))
+        {
+            R = C*fmod(huep, 1) + m;
+            B = V;
+            G = m;
+        }
+        else if ((huep >= 5) && (huep < 6))
+        {
+            B = -C*fmod(huep,1) + V;
+            R = V;
+            G = m;
+        }
+        else
+        {
+            R = 0;
+            G = 0;
+            B = 0;
+        }
+
+        im.data[i] = R;
+        im.data[i + channelOffset] = G;
+        im.data[i + channelOffset * 2] = B;
+    }   
 }
