@@ -235,9 +235,22 @@ void hsv_to_rgb(image im)
             G = 0;
             B = 0;
         }
-
         im.data[i] = R;
         im.data[i + channelOffset] = G;
         im.data[i + channelOffset * 2] = B;
     }   
+}
+
+void scale_image(image im, int c, float v)
+{
+    float pixel=0;
+    for (int y=0; y!=im.h; y++)
+    {
+        for (int x=0; x!=im.w; x++)
+        {
+            pixel = get_pixel(im, x, y, c);
+            set_pixel(im, x, y, c, pixel*v);
+        }
+    }
+
 }
