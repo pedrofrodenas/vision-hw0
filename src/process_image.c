@@ -252,5 +252,4 @@ void scale_image(image im, int c, float v)
             set_pixel(im, x, y, c, pixel*v);
         }
     }
-
 }
